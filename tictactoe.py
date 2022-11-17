@@ -140,17 +140,19 @@ def utility(board):
     elif winner(board) == None:
         return 0
 
+
 def minimax(board):
 
     """
     Returns the optimal action for the current player on the board.
     """
+    
+    #values for alpha-beta pruning
+    alpha = -math.inf
+    beta = math.inf
 
-    def max_value(board):
-
-        """
-        Returns the maximized value of the board state.
-        """
+    #returns the maximized value of the board state.
+    def max_value(board, alpha, beta):
 
         optimal_move = ()
 
@@ -159,17 +161,22 @@ def minimax(board):
         else:
             v = -math.inf
             for action in actions(board):
-                v = max(v, min_value(result(board, action))[0])
+                v = max(v, min_value(result(board, action), alpha, beta)[0])
                 optimal_move = action
+
+                if v >= beta:
+                    break
                 
-            return [v, optimal_move]
+                if v > alpha:
+                    alpha = v
 
-    def min_value(board):
+                print(v)#log to debug
+
+        return [v, optimal_move]
+
+    #returns the mainimum value of the board state.
+    def min_value(board, alpha, beta):
         
-        """
-        Returns the mainimum value of the board state.
-        """
-
         optimal_move = ()
 
         if terminal(board):
@@ -177,18 +184,26 @@ def minimax(board):
         else:
             v = math.inf
             for action in actions(board):
-                v = min(v, max_value(result(board, action))[0])
+                v = min(v, max_value(result(board, action), alpha, beta)[0])
                 optimal_move = action
-                
-            return [v, optimal_move]
+
+                if v <= alpha:
+                    break
+
+                if v < beta:
+                    beta = v
+
+                print(v) #log to debug
+
+        return [v, optimal_move]
 
     if terminal(board):
         return None
 
     if player(board) == X:
-        optimal_action = max_value(board)[1]
+        optimal_action = max_value(board, alpha, beta)[1]
     elif player(board) == O:
-        optimal_action = min_value(board)[1]
+        optimal_action = min_value(board, alpha, beta)[1]
     
     return optimal_action
 
